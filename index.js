@@ -19,6 +19,7 @@ const commentRoute = require("./Routes/Comment.Route");
 const commentModel = require("./modules/Comment.model");
 const comDikLike = require("./Routes/commentDisLIke.Route");
 const comLike = require("./Routes/commentLike.Route");
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const {
   uploadFile,
   urlPublicURL,
@@ -26,6 +27,8 @@ const {
 } = require("./controller/FileUpload.controller");
 const upload = require("./controller/upload");
 app.use(body_Parser.json());
+
+const uri = "mongodb+srv://Hassaan:VideoStream@videostramapp.g4mfiyd.mongodb.net/?retryWrites=true&w=majority";
 
 app.use(cors());
 
@@ -40,15 +43,40 @@ app.use("/comment", commentRoute);
 app.use("/commentLike", comLike);
 app.use("/commentDislike", comDikLike);
 
-mongo
-  .connect("mongodb://localhost:27017/video_Service")
+/*const client = new MongoClient(uri, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
+});*/
+
+ mongo
+     .connect(uri, {
+         useNewUrlParser: true,
+     })
   .then(() => {
-    app.listen(port, () => {
-      console.log("Server is started http://localhost:3000");
-    });
+   app.listen(port, () => {
+   console.log("Server is started http://localhost:3000");
+ });
     console.log("MongoDB is started");
   })
-  .catch((err) => console.log(err));
+   .catch((err) => console.log(err));
+
+/*async function run() {
+    try {
+        // Connect the client to the server	(optional starting in v4.7)
+        await client.connect();
+        // Send a ping to confirm a successful connection
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        await client.close();
+    }
+}
+
+run().catch(console.dir);*/
 
 app.get("/", async (req, res) => {
   const videos = await videoSevice.find();
