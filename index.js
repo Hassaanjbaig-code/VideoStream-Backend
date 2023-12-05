@@ -53,8 +53,13 @@ mongo
 app.get("/", async (req, res) => {
   const videos = await videoSevice.find();
 
+  console.log(videos)
+
   if (videos.length === 0) {
-    return res.status(200).json("Add a Video");
+    return res.status(200).json({
+      status: 200,
+      data: []
+    });
   }
 
   const videoDataWithChannels = await Promise.all(

@@ -22,10 +22,10 @@ const drive = google.drive({
   auth: oauth2Client,
 });
 
-
 async function uploadFile(File) {
   try {
     // Create a readable stream from the buffer
+    console.log(File);
     const fileStream = new Readable();
     fileStream.push(File.buffer);
     fileStream.push(null); // Signal the end of the stream
@@ -36,7 +36,7 @@ async function uploadFile(File) {
         mimeType: File.mimetype,
       },
       media: {
-        mimeType: "image/jpeg",
+        mimeType: File.mimetype,
         body: fileStream, // Use the readable stream
       },
     });
@@ -44,8 +44,25 @@ async function uploadFile(File) {
     // console.log(response);
     return response;
   } catch (error) {
-    console.log("Getting error for FileU", error);
+    if (error.code === 401 || error.status == 400) {
+      // Token expired, refresh and retry
+      console.log("Error is comming")
+      await refreshToken();
+      return uploadFile(File);
+    }
+
+    console.log('Getting error for File', error);
     return error;
+  }
+}
+
+async function refreshToken() {
+  try {
+    const { tokens } = await oauth2Client.refreshAccessToken();
+    oauth2Client.setCredentials(tokens);
+  } catch (error) {
+    console.error('Error refreshing access token:', error);
+    throw error;
   }
 }
 

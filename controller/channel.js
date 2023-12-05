@@ -23,7 +23,7 @@ function FetchChannel(req, res) {
 
 async function PostChannel(req, res) {
   // console.log(req.file.mimetype)
-  console.log(req.file)
+  // console.log(req.file)
   try {
     const { name, description } = req.body;
     let image  = req.file; // Assuming you are using middleware like multer for file uploads
@@ -62,11 +62,12 @@ async function PostChannel(req, res) {
 
     // Upload the file
     // console.log(image)
+    console.log("Program is working now")
     const file = await uploadFile(image);
 
     // console.log("This the return which we are getting ",file);
 
-    // console.log
+    console.log("Checking the file",file)
     let URLimage = await urlPublicURL(file.data.id)
     // res.status(200).json(URLimage)
     // Now you can use 'file' and other data to create a new channel
