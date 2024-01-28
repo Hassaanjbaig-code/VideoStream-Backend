@@ -19,11 +19,13 @@ const commentRoute = require("./Routes/Comment.Route");
 const commentModel = require("./modules/Comment.model");
 const comDikLike = require("./Routes/commentDisLIke.Route");
 const comLike = require("./Routes/commentLike.Route");
+
 const {
   uploadFile,
   urlPublicURL,
   deleteFile,
 } = require("./controller/FileUpload.controller");
+const { uploadFileC, DeleteImageC } = require("./controller/FileUploadCloudinary.controller")
 const upload = require("./controller/upload");
 app.use(body_Parser.json());
 
@@ -39,21 +41,19 @@ app.use("/Dislike", DislikeRoute);
 app.use("/comment", commentRoute);
 app.use("/commentLike", comLike);
 app.use("/commentDislike", comDikLike);
-
+app.use(body_Parser.urlencoded({ extended: true }));
 mongo
-  .connect("mongodb://localhost:27017/video_Service")
+  .connect("mongodb://localhost:27017/VideoScribe")
   .then(() => {
     app.listen(port, () => {
       console.log("Server is started http://localhost:3000");
     });
-    console.log("MongoDB is started");
+    console.log("MongoDB is started and cloudinary is connected");
   })
   .catch((err) => console.log(err));
 
 app.get("/", async (req, res) => {
   const videos = await videoSevice.find();
-
-  console.log(videos)
 
   if (videos.length === 0) {
     return res.status(200).json({
@@ -114,10 +114,10 @@ app.post(
       });
     }
     let channelId = channel[0]._id;
-    let uploadImage = await uploadFile(image);
-    let uploadVideo = await uploadFile(video);
-    let URLimage = await urlPublicURL(uploadImage.data.id);
-    let URLVideo = await urlPublicURL(uploadVideo.data.id);
+    // let uploadImage = await uploadFile(image);
+    // let uploadVideo = await uploadFile(video);
+    let uploadImage = await uploadFileC(image);
+    let uploadVideo = await uploadFileC(video);
     // console.log(uploadVideo.data.id)
     videoSevice.find({ title, description }).then(async (data) => {
       // console.log(data);
@@ -126,10 +126,10 @@ app.post(
         const Created = await videoSevice.create({
           title,
           description,
-          image: URLimage.webContentLink,
-          video: URLVideo.webContentLink,
-          imageID: uploadImage.data.id,
-          videoID: uploadVideo.data.id,
+          image: uploadImage.url,
+          video: uploadVideo.url,
+          imageID: uploadImage.public_id,
+          videoID: uploadVideo.public_id,
           channel: channelId,
         });
         res.status(200).json({
@@ -137,7 +137,6 @@ app.post(
           body: Created,
         });
       } catch (error) {
-        console.log(error);
         res.status(500).json(error.message);
       }
     });
@@ -238,7 +237,7 @@ app.get("/:id", async (req, res) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      
       res.status(500).json(err);
     });
 });

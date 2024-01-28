@@ -6,8 +6,6 @@ function commentDislikeget(req, res) {
   const userId = req.user.user[0]._id;
   const commentID = req.params.id;
 
-  console.log("UserID", userId);
-
   channelModel.find({ user: userId }).then((result) => {
     // console.log("Channel Detail",result)
     if (!result) {
@@ -32,7 +30,6 @@ function commentDislikeget(req, res) {
           commentDislike
             .findOne({ comment: commentID, channel: channalId })
             .then((foundLike) => {
-              console.log(foundLike);
               if (foundLike) {
                 // If a like exists, remove it
                 commentDislike
@@ -61,14 +58,12 @@ function commentDislikeget(req, res) {
 
                 DislikeComment.save()
                   .then(() => {
-                    console.log("Like is Save");
                     res.status(201).json({
                       status: 201,
                       message: `Like has been added to this video`,
                     });
                   })
                   .catch((error) => {
-                    console.log(error.message);
                     res.status(500).json({
                       status: 500,
                       message: error,

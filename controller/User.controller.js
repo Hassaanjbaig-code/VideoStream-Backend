@@ -8,9 +8,8 @@ function UserIntro(req, res) {
   //   console.log("Working", user);
   // res.status(200).json("Working")
   channelModel.find({ user: user }).then((result) => {
-    console.log(result)
     // console.log(result);
-    if (!result) {
+    if (result.length == 0) {
       res.status(404).json({
         status: 404,
         message: "Please create a Channel",

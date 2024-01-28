@@ -1,6 +1,7 @@
 const channelModel = require("../modules/Channal.model");
 const userModel = require("../modules/User.model");
 const { uploadFile, urlPublicURL } = require("./FileUpload.controller")
+const { uploadFileC } = require("./FileUploadCloudinary.controller")
 
 function FetchChannel(req, res) {
   channelModel
@@ -22,11 +23,11 @@ function FetchChannel(req, res) {
 }
 
 async function PostChannel(req, res) {
-  // console.log(req.file.mimetype)
-  // console.log(req.file)
+  console.log("This is working.")
+  // console.log("This is for user testing", req.user.user[0]) User is coming 
   try {
     const { name, description } = req.body;
-    let image  = req.file; // Assuming you are using middleware like multer for file uploads
+    let image  = req.file; 
 
     // console.log(image);
 
@@ -62,19 +63,20 @@ async function PostChannel(req, res) {
 
     // Upload the file
     // console.log(image)
-    console.log("Program is working now")
-    const file = await uploadFile(image);
+    const file = await uploadFileC(image);
+    // console.log("This is the file we are getting", file.url)
 
     // console.log("This the return which we are getting ",file);
-
-    console.log("Checking the file",file)
-    let URLimage = await urlPublicURL(file.data.id)
-    // res.status(200).json(URLimage)
+    if (file.message == 400) {
+      res.status(400).json(file.error)
+    } else {
+      // let URLimage = await urlPublicURL(file.data.id)
+      // res.status(200).json(URLimage)
     // Now you can use 'file' and other data to create a new channel
     const newChannel = new channelModel({
       name,
-      image: URLimage.webContentLink, // Assuming 'url' is the property containing the file URL after upload
-      imageID: file.data.id,
+      image: file.url, // Assuming 'url' is the property containing the file URL after upload
+      imageID: file.public_id,
       description,
       user: userId,
     });
@@ -85,6 +87,7 @@ async function PostChannel(req, res) {
         message: "Channel created successfully",
       });
     });
+  }
   } catch (error) {
     console.error("Error creating channel:", error);
     return res.status(500).json({

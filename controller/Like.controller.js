@@ -20,7 +20,6 @@ function postLike(req, res) {
     // console.log()
     // Check if a like already exists for the given video and user
     like.findOne({ video: videoId, channel: channalId }).then((foundLike) => {
-      console.log(foundLike)
       if (foundLike) {
         // If a like exists, remove it
         like
@@ -50,14 +49,12 @@ function postLike(req, res) {
         likeVideo
           .save()
           .then(() => {
-            console.log("Like is Save")
             res.status(201).json({
               status: 201,
               message: `Like has been added to this video`,
             });
           })
           .catch((error) => {
-            console.log(error.message)
             res.status(500).json({
               status: 500,
               message: error,

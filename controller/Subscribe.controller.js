@@ -2,10 +2,8 @@ const channelModel = require("../modules/Channal.model");
 const SubscribeModule = require("../modules/Subcribe.model");
 
 function SubscribeChannel(req, res) {
-  console.log("This is working of Subscribe")
   const userId = req.user.user[0]._id; // Subscribe user
   const subscribeId = req.params.id; // which you wanted to subscibe`
-  console.log("Subscribe", userId);
   if (!userId) {
     res.status(404).json({
       status: 404,
@@ -27,7 +25,6 @@ function SubscribeChannel(req, res) {
             message: "Please enter a channel",
           });
         }
-        console.log(subChannel)
         
         let channalId = result[0]._id;
         // console.log()

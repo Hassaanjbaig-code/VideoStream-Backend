@@ -5,8 +5,6 @@ function postDisLike(req, res) {
   const userId = req.user.user[0]._id;
   const videoId = req.params.id;
 
-  console.log("UserID",userId)
-
   channelModel.find({user: userId}).then((result) => {
     // console.log("Channel Detail",result)
     if (!result) {
@@ -20,7 +18,6 @@ function postDisLike(req, res) {
     // console.log()
     // Check if a like already exists for the given video and user
     modelDisLike.findOne({ video: videoId, channel: channalId }).then((foundDislike) => {
-      console.log(foundDislike)
       if (foundDislike) {
         // If a like exists, remove it
         modelDisLike
@@ -50,14 +47,12 @@ function postDisLike(req, res) {
         DislikeVideo
           .save()
           .then(() => {
-            console.log("Dislike is Save")
             res.status(201).json({
               status: 201,
               message: `Dislike has been added to this video`,
             });
           })
           .catch((error) => {
-            console.log(error.message)
             res.status(500).json({
               status: 500,
               message: error,

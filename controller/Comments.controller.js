@@ -5,7 +5,6 @@ const commentLike = require("../modules/commentLike.model");
 function postComment(req, res) {
   const userId = req.user.user[0]._id;
   const videoId = req.params.id;
-  console.log("Working of post comment");
   let { comment } = req.body;
   if (!comment) {
     return res.status(400).json({ status: 400, messgae: "Add a comment" });
@@ -47,7 +46,6 @@ function postComment(req, res) {
             channel: channalId,
           });
           createChannel.save().then(() => {
-            console.log("Comment is created");
             res.status(201).json({
               status: 201,
               message: "Comment is Added",
@@ -68,12 +66,10 @@ function deleteComment(req, res) {
       let channelId = result[0]._id;
       // console.log("Find a channel ID", channelId)
       commentModel.find({channel: channelId, _id: id}).then((resultForComment) => {
-        console.log("Comment in this id" ,resultForComment)
       })
       commentModel
         .findOneAndDelete({ channel: channelId, _id: id })
         .then((result) => {
-          console.log(result)
           if (!result) {
             res.status(404).json({
               status: 404,

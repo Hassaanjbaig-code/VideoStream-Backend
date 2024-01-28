@@ -5,8 +5,6 @@ function commentLikeGet(req, res) {
   const userId = req.user.user[0]._id;
   const commentID = req.params.id;
 
-  console.log("UserID", userId);
-
   channelModel.find({ user: userId }).then((result) => {
     // console.log("Channel Detail",result)
     if (!result) {
@@ -20,7 +18,6 @@ function commentLikeGet(req, res) {
     // console.log()
     // Check if a like already exists for the given video and user
     commentLike.findOne({ comment: commentID, channel: channalId }).then((foundLike) => {
-      console.log(foundLike);
       if (foundLike) {
         // If a like exists, remove it
         commentLike
@@ -50,14 +47,12 @@ function commentLikeGet(req, res) {
         likeComment
           .save()
           .then(() => {
-            console.log("Like is Save");
             res.status(201).json({
               status: 201,
               message: `Like has been added to this video`,
             });
           })
           .catch((error) => {
-            console.log(error.message);
             res.status(500).json({
               status: 500,
               message: error,
