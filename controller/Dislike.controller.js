@@ -25,7 +25,7 @@ function postDisLike(req, res) {
           .then(() => {
             res.status(200).json({
               status: 200,
-              message: "Dislike has been removed",
+              message: 250,
             });
           })
           .catch((error) => {
@@ -42,14 +42,12 @@ function postDisLike(req, res) {
           channel: channalId,
         });
 
-        // console.log("This is Like video new",likeVideo)
-
         DislikeVideo
           .save()
           .then(() => {
             res.status(201).json({
               status: 201,
-              message: `Dislike has been added to this video`,
+              message: 200
             });
           })
           .catch((error) => {

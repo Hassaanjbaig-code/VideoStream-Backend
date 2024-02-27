@@ -19,13 +19,17 @@ const commentRoute = require("./Routes/Comment.Route");
 const commentModel = require("./modules/Comment.model");
 const comDikLike = require("./Routes/commentDisLIke.Route");
 const comLike = require("./Routes/commentLike.Route");
-
+const dotenv = require("dotenv");
+dotenv.config();
 const {
   uploadFile,
   urlPublicURL,
   deleteFile,
 } = require("./controller/FileUpload.controller");
-const { uploadFileC, DeleteImageC } = require("./controller/FileUploadCloudinary.controller")
+const {
+  uploadFileC,
+  DeleteImageC,
+} = require("./controller/FileUploadCloudinary.controller");
 const upload = require("./controller/upload");
 app.use(body_Parser.json());
 
@@ -42,8 +46,13 @@ app.use("/comment", commentRoute);
 app.use("/commentLike", comLike);
 app.use("/commentDislike", comDikLike);
 app.use(body_Parser.urlencoded({ extended: true }));
+
+const url = process.env.URL
+
 mongo
-  .connect("mongodb://localhost:27017/VideoScribe")
+  .connect(url, {
+    useNewUrlParser: true,
+  })
   .then(() => {
     app.listen(port, () => {
       console.log("Server is started http://localhost:3000");
@@ -58,7 +67,7 @@ app.get("/", async (req, res) => {
   if (videos.length === 0) {
     return res.status(200).json({
       status: 200,
-      data: []
+      data: [],
     });
   }
 
@@ -99,7 +108,6 @@ app.post(
         message: "PLease conform that you added a image and video",
       });
     }
-    console.log(req.files["video"]);
     if (req.files) {
       image = req.files["image"][0];
       video = req.files["video"][0];
@@ -148,11 +156,6 @@ app.delete("/:id", VerifyJson, async (req, res) => {
   let videoID = await videoSevice.findById(id);
   await deleteFile(videoID.videoID);
   await deleteFile(videoID.imageID);
-  // if (deleteImageDrive.status == 200 ) {
-
-  // }
-  // console.log("This is the video Delete", deleteVideoDrive)
-  // console.log("This is the Image Delete", deleteImageDrive)
   videoSevice
     .findByIdAndDelete(id)
     .then((result) => {
@@ -193,7 +196,7 @@ app.get("/:id", async (req, res) => {
         video: id,
       });
       // console.log(comment)
-      let videos= await GetVideo(id);
+      let videos = await GetVideo(id);
       // let videos = await Promise.all(
       //   video.map(async (data) => {
       //     // await data.populate("channel");
@@ -209,7 +212,7 @@ app.get("/:id", async (req, res) => {
       const enrichedVideos = await Promise.all(
         videos.map(async (video) => {
           const channel = await channelModel.findById(video.channel);
-      
+
           return {
             video,
             channelName: channel.name,
@@ -237,7 +240,6 @@ app.get("/:id", async (req, res) => {
       });
     })
     .catch((err) => {
-      
       res.status(500).json(err);
     });
 });

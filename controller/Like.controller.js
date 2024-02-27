@@ -27,7 +27,7 @@ function postLike(req, res) {
           .then(() => {
             res.status(200).json({
               status: 200,
-              message: "Like has been removed",
+              message: 250,
             });
           })
           .catch((error) => {
@@ -51,7 +51,7 @@ function postLike(req, res) {
           .then(() => {
             res.status(201).json({
               status: 201,
-              message: `Like has been added to this video`,
+              message: 200,
             });
           })
           .catch((error) => {

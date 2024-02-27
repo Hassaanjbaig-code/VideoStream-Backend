@@ -38,8 +38,8 @@ function SubscribeChannel(req, res) {
             SubscribeModule.findByIdAndRemove(foundLike._id)
             .then(() => {
               res.status(200).json({
-                status: 300,
-                message: "Subscribe has been removed",
+                status: 201,
+                message: 200,
               });
             })
             .catch((error) => {
@@ -63,7 +63,7 @@ function SubscribeChannel(req, res) {
             .then(() => {
               res.status(201).json({
                 status: 201,
-                message: `Subscribe to this channel`,
+                message: 200,
               });
             })
             .catch((error) => {
