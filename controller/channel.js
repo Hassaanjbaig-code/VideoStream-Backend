@@ -23,7 +23,6 @@ function FetchChannel(req, res) {
 }
 
 async function PostChannel(req, res) {
-  console.log("This is working.")
   // console.log("This is for user testing", req.user.user[0]) User is coming 
   try {
     const { name, description } = req.body;

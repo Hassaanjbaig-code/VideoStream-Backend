@@ -4,7 +4,6 @@ dotenv.config();
 
 function VerifyJson(req, res, next) {
   const authdata = req.headers["authorization"];
-  console.log("This is the authdata", req.headers)
   const token = authdata && authdata.split(" ")[1];
   if (token == null || undefined) return res.status(404).json("Login Again");
   jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {

@@ -18,13 +18,7 @@ function SubscribeChannel(req, res) {
           message: "Create a channel",
         });
       }
-      channelModel.findById(subscribeId).then((subChannel) => {
-        if (subChannel.length == 0) {
-          return res.status(404).json({
-            status: 404,
-            message: "Please enter a channel",
-          });
-        }
+      console.log(result)
         
         let channalId = result[0]._id;
         // console.log()
@@ -38,8 +32,8 @@ function SubscribeChannel(req, res) {
             SubscribeModule.findByIdAndRemove(foundLike._id)
             .then(() => {
               res.status(200).json({
-                status: 201,
-                message: 200,
+                status: 250,
+                message: "Subscribe is Remove",
               });
             })
             .catch((error) => {
@@ -55,15 +49,14 @@ function SubscribeChannel(req, res) {
               mainChannel: channalId,
               subScribeChannel: subscribeId,
             });
-            
             // console.log("This is Like video new",likeVideo)
 
             subscribeChannel
             .save()
             .then(() => {
               res.status(201).json({
-                status: 201,
-                message: 200,
+                status: 200,
+                message: "Subscribe is Save",
               });
             })
             .catch((error) => {
@@ -75,7 +68,6 @@ function SubscribeChannel(req, res) {
           }
         })
       });
-    });
   }
 }
 

@@ -4,7 +4,6 @@ const videoModel = require("../modules/VideoSchema.model");
 
 function UserIntro(req, res) {
   let user = req.user.user[0]._id;
-  // console.log(req)
   //   console.log("Working", user);
   // res.status(200).json("Working")
   channelModel.find({ user: user }).then((result) => {
@@ -17,7 +16,6 @@ function UserIntro(req, res) {
     } else {
       videoModel.find({ channel: result[0]._id }).then((chanVideo) => {
         SubscribeModule.find({ channel: result[0]._id }).then((totalSubscribe) => {
-          console.log(chanVideo);
           if (chanVideo == 0) {
             res.status(202).json({
               status: 202,
