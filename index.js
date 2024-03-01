@@ -59,7 +59,7 @@ mongo
     });
     console.log("MongoDB is started and cloudinary is connected");
   })
-  .catch((err) => console.log(err));
+  .catch((err) => console.error(err));
 
 app.get("/", async (req, res) => {
   const videos = await videoSevice.find();
@@ -128,8 +128,7 @@ app.post(
     let uploadVideo = await uploadFileC(video);
     // console.log(uploadVideo.data.id)
     videoSevice.find({ title, description }).then(async (data) => {
-      // console.log(data);
-      if (data.length) return res.status(404).json("Already Exiten");
+      if (data.length) return res.status(404).json("Already Exist");
       try {
         const Created = await videoSevice.create({
           title,
@@ -170,20 +169,16 @@ app.delete("/:id", VerifyJson, async (req, res) => {
 app.get("/:id", async (req, res) => {
   let { id } = req.params;
   videoSevice
-    .findById(id)
-    .then(async (result) => {
+  .findById(id)
+  .then(async (result) => {
       if (!result) {
         return res.status(404).json("Video not found");
       }
-      // console.log(result)
-
+      
       const resultChannel = await channelModel.findById(result.channel);
-      const Calculatesubscribe = await SubscribeModule.find({
-        subScribeChannel: result.channel,
+      const TotalSubscribe = await SubscribeModule.find({
+        mainChannel: result.channel,
       });
-
-      // console.log(resultChannel)
-      // cons
       const countLike = await LikeModel.find({
         video: id,
       });
@@ -195,20 +190,7 @@ app.get("/:id", async (req, res) => {
       const comment = await commentModel.find({
         video: id,
       });
-      // console.log(comment)
       let videos = await GetVideo(id);
-      // let videos = await Promise.all(
-      //   video.map(async (data) => {
-      //     // await data.populate("channel");
-      //     let channel = await channelModel.findById(data.channel)
-      //     // console.log("This is the channel", channel)
-      //     return {
-      //       video: video[0],
-      //       channelName: channel.name,
-      //       channelImage: channel.image,
-      //     };
-      //   })
-      // );
       const enrichedVideos = await Promise.all(
         videos.map(async (video) => {
           const channel = await channelModel.findById(video.channel);
@@ -228,14 +210,14 @@ app.get("/:id", async (req, res) => {
       res.status(200).json({
         channel: resultChannel,
         data: result,
-        calculate: Calculatesubscribe.length,
+        calculate: TotalSubscribe.length,
         like: countLike.length,
         Dislike: countDislike.length,
         comment: comment,
         TotalComment: comment.length,
         Like: countLike,
         DisLike: countDislike,
-        subscribe: Calculatesubscribe,
+        subscribe: TotalSubscribe,
         sideVideo: enrichedVideos,
       });
     })
@@ -248,53 +230,5 @@ async function GetVideo(id) {
   // $ne for remove one id in the array in the database
   const query = { _id: { $ne: id } };
   const documents = await videoSevice.find(query);
-  // console.log(documents)
   return documents;
 }
-
-// app.post("/channel", (req, res) => {
-//   let { name, image, description, videoService } = req.body;
-//   let user = req.user.id;
-//   // console.log(req.body)
-//   if (!name || !image || !description || !videoService)
-//     return res.status(404).json("Please Fill the Field");
-//   user = req.user._id;
-//   userModel.find({ user }).then((data) => {
-//     if (!data) return res.status(404).json("User is not found");
-//     channelModel.find({ name, description, image }).then((data) => {
-//       if (data.length >= 0)
-//         return res.status(404).json("Channel is already exit");
-//       try {
-//         const Created = channelModel.create({
-//           name,
-//           image,
-//           description,
-//           videoService,
-//           user,
-//         });
-//         res.status(200).json(Created);
-//       } catch (error) {
-//         console.log(error);
-//         res.status(500).json(error.message);
-//       }
-//     });
-//   });
-// });
-
-// app.get("/channel", (req, res) => {
-//   try {
-//     channelModel.find().then((result) => {
-//       if (result.length == 0) {
-//         return res
-//           .status(404)
-//           .json({ message: "There is no channel", status: 404 });
-//       }
-//       res.status(200).json({
-//         data: result,
-//         status: 200,
-//       });
-//     });
-//   } catch (error) {
-//     res.status(404).json(error)
-//   }
-// });

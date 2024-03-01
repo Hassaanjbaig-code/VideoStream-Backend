@@ -1,73 +1,60 @@
 const channelModel = require("../modules/Channal.model");
 const SubscribeModule = require("../modules/Subcribe.model");
+const videoSevice = require("../modules/VideoSchema.model")
 
-function SubscribeChannel(req, res) {
+async function SubscribeChannel(req, res) {
   const userId = req.user.user[0]._id; // Subscribe user
-  const subscribeId = req.params.id; // which you wanted to subscibe`
-  if (!userId) {
-    res.status(404).json({
-      status: 404,
-      message: "Please sign in",
-    });
-  } else {
-    channelModel.find({ user: userId }).then((result) => {
-      // console.log("Channel Detail",result)
-      if (!result) {
-        return res.status(404).json({
-          status: 404,
-          message: "Create a channel",
-        });
-      }
-      console.log(result)
-        
-        let channalId = result[0]._id;
-        // console.log()
-        // Check if a like already exists for the given video and user
-        SubscribeModule.findOne({
-          mainChannel: channalId,
-          subScribeChannel: subscribeId,
-        }).then((foundLike) => {
-          if (foundLike) {
-            // If a like exists, remove it
-            SubscribeModule.findByIdAndRemove(foundLike._id)
-            .then(() => {
-              res.status(200).json({
-                status: 250,
-                message: "Subscribe is Remove",
-              });
-            })
-            .catch((error) => {
-              res.status(500).json({
-                status: 500,
-                message: error,
-              });
-            });
-          } else {
-            // If no like exists, create a new like document
-            const subscribeChannel = new SubscribeModule({
-              count: 1, // Set the initial count to 1
-              mainChannel: channalId,
-              subScribeChannel: subscribeId,
-            });
-            // console.log("This is Like video new",likeVideo)
-
-            subscribeChannel
-            .save()
-            .then(() => {
-              res.status(201).json({
-                status: 200,
-                message: "Subscribe is Save",
-              });
-            })
-            .catch((error) => {
-              res.status(500).json({
-                status: 500,
-                message: error,
-              });
-            });
-          }
-        })
+  // const { subscribeId, id } = req.params // Channel to subscribe to and video id
+  const id = req.params.id
+  const VideoData = await videoSevice.findById(id)
+  const mainChannel = VideoData.channel.toString()
+  try {
+    const channels = await channelModel.find({ user: userId });
+    if (!channels || channels.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "Create a channel",
       });
+    }
+    
+    const channelId = channels[0]._id.toString();
+    
+    // Check if a subscription already exists for the given channels
+    console.log("MianChannel is found", mainChannel);
+    const foundSubscription = await SubscribeModule.findOne({
+      mainChannel,
+      subScribeChannel: channelId
+    });
+    
+    if (foundSubscription) {
+      console.log("Subscribe is found", foundSubscription);
+      let FoundedSubscriptionID = foundSubscription._id
+      // If a subscription exists, remove it
+      await SubscribeModule.findByIdAndRemove(FoundedSubscriptionID)
+      return res.status(200).json({
+        status: 200,
+        message: "Subscription removed",
+      });
+    } else {
+      console.log("You have to create new")
+      //   // If no subscription exists, create a new one
+  //     console.log("This is the VideoData",mainChannel, " ", channelId)
+      const newSubscription = new SubscribeModule({
+        count: 1, // Set the initial count to 1
+        mainChannel,
+        subScribeChannel: channelId,
+      });
+      await newSubscription.save();
+      return res.status(201).json({
+        status: 201,
+        message: "Subscription saved",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: error.message,
+    });
   }
 }
 
