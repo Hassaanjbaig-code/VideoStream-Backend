@@ -4,7 +4,6 @@ const videoModel = require("../modules/VideoSchema.model");
 
 function UserIntro(req, res) {
   let user = req.user.user[0]._id;
-  //   console.log("Working", user);
   // res.status(200).json("Working")
   channelModel.find({ user: user }).then((result) => {
     // console.log(result);

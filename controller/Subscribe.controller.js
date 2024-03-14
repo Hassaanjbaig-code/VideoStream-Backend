@@ -4,10 +4,9 @@ const videoSevice = require("../modules/VideoSchema.model")
 
 async function SubscribeChannel(req, res) {
   const userId = req.user.user[0]._id; // Subscribe user
-  // const { subscribeId, id } = req.params // Channel to subscribe to and video id
   const id = req.params.id
   const VideoData = await videoSevice.findById(id)
-  const mainChannel = VideoData.channel.toString()
+  const mainChannel = VideoData.channel.toString() // Find the main Channel ID
   try {
     const channels = await channelModel.find({ user: userId });
     if (!channels || channels.length === 0) {
@@ -36,9 +35,6 @@ async function SubscribeChannel(req, res) {
         message: "Subscription removed",
       });
     } else {
-      console.log("You have to create new")
-      //   // If no subscription exists, create a new one
-  //     console.log("This is the VideoData",mainChannel, " ", channelId)
       const newSubscription = new SubscribeModule({
         count: 1, // Set the initial count to 1
         mainChannel,

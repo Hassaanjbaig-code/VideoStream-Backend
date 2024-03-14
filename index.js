@@ -18,8 +18,10 @@ const modelDisLike = require("./modules/Dislike.model");
 const commentRoute = require("./Routes/Comment.Route");
 const commentModel = require("./modules/Comment.model");
 const comDikLike = require("./Routes/commentDisLIke.Route");
+const ConfirmRoute = require("./Routes/ConfirmEmail.Route")
 const comLike = require("./Routes/commentLike.Route");
 const dotenv = require("dotenv");
+const resendRoute = require("./Routes/ResendLink.Route")
 dotenv.config();
 const {
   uploadFile,
@@ -45,6 +47,8 @@ app.use("/Dislike", DislikeRoute);
 app.use("/comment", commentRoute);
 app.use("/commentLike", comLike);
 app.use("/commentDislike", comDikLike);
+app.use("/confirmation", ConfirmRoute);
+app.use("/resendLink", resendRoute)
 app.use(body_Parser.urlencoded({ extended: true }));
 
 const url = process.env.URL
