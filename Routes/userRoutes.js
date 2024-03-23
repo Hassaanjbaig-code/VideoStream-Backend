@@ -70,10 +70,6 @@ routes.post("/SignUp", jsonParser, async (req, res) => {
       token: crypto.randomBytes(16).toString("hex"),
     });
 
-    // token.save(function (err) {
-    //   if (err) res.status(404).send({ mes: err.message });
-    // });
-
     token
       .save()
       .then(() => {
@@ -86,62 +82,33 @@ routes.post("/SignUp", jsonParser, async (req, res) => {
     // Sending an email for confirmation
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
+      host: "smtp-mail.outlook.com",
       auth: {
-        user: "maxime78@ethereal.email",
-        pass: "KzT4B37KbwenV62bs5",
+        user: process.env.outlook_email,
+        pass: process.env.outlook_pass,
       },
     });
 
     var mailOptions = {
-      from: "Hassaan <hassaanb000@gmail.com>",
+      from: "videoScribe12@hotmail.com",
       to: email,
       subject: "Account Verification Link",
-      // text:
-      //   "Hello " +
-      //   req.body.name +
-      //   ",\n\n" +
-      //   "Please verify your account by clicking the link: \nhttp://" +
-      //   req.headers.host +
-      //   "/confirmation/" +
-      //   email +
-      //   "/" +
-      //   token.token +
-      //   "\n\nThank You!\n",
       html: `Hello ${newUser.email},\n\nPlease verify your account by clicking the link: <a href="http://${req.headers.host}/confirmation/${newUser.email}/${token.token}">CLick me</a> You!\n`,
     };
     transporter.sendMail(mailOptions, function (err) {
+      console.log(err);
       if (err) {
-        return res
-          .status(500)
-          .send({
-            msg: "Technical Issue!, Please click on resend for verify your Email.",
-          })
-          .json({
-            msg: "Technical Issue!, Please click on resend for verify your Email.",
-          });
-      }
-      return res
-        .status(200)
-        .send(
-          "A verification email has been sent to " +
-            newUser.email +
-            ". It will be expire after one day. If you not get verification Email click on resend token."
-        )
-        .json({
-          msg:
-            "A verification email has been sent to " +
-            newUser.email +
-            ". It will be expire after one day. If you not get verification Email click on resend token.",
+        return res.status(500).json({
+          msg: "Technical Issue!, Please click on resend for verify your Email.",
         });
+      }
+      return res.status(200).json({
+        msg:
+          "A verification email has been sent to " +
+          newUser.email +
+          ". It will be expire after one day. If you not get verification Email click on resend token.",
+      });
     });
-
-    // res.status(201).json({
-    //   message: "User is created",
-    //   status: 201,
-    //   user: savedUser,
-    // });
   } catch (err) {
     res.status(500).json({
       message: `Error while creating user: ${err}`,
@@ -172,7 +139,6 @@ routes.post("/LogIn", jsonParser, async (req, res) => {
       const token = GenerateJson(data);
       const channel = await channelModel.find({ user: data[0]._id });
       if (channel.length > 0) {
-        console.log(channel[0]._id);
         return res.status(200).json({
           status: 200,
           message: `You are LogIn`,
@@ -187,6 +153,7 @@ routes.post("/LogIn", jsonParser, async (req, res) => {
           status: 200,
           message: `You are LogIn`,
           token,
+          verify: data.isVerified,
           channel: {
             status: 404,
             message: "Channel Not Found",
@@ -202,7 +169,7 @@ routes.post("/LogIn", jsonParser, async (req, res) => {
     console.error(error);
     return res
       .status(500)
-      .json({ message: "Internal Server Error", status: 500 });
+      .json({ message: `Internal Server Error ${error}`});
   }
 });
 
