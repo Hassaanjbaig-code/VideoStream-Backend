@@ -142,6 +142,7 @@ routes.post("/LogIn", jsonParser, async (req, res) => {
         return res.status(200).json({
           status: 200,
           message: `You are LogIn`,
+          verify: data[0].isVerified,
           token,
           channel: {
             status: 200,
@@ -153,7 +154,7 @@ routes.post("/LogIn", jsonParser, async (req, res) => {
           status: 200,
           message: `You are LogIn`,
           token,
-          verify: data.isVerified,
+          verify: data[0].isVerified,
           channel: {
             status: 404,
             message: "Channel Not Found",
